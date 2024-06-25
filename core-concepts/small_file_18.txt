@@ -1,0 +1,37 @@
+ check description for all list
+                    "1001",
+                    "1011"
+                  ]
+          description: >
+            Resource Name / ID
+              
+        resource_access:
+          type: "string"
+          "enum": [
+                    "read_only",
+                    "read_write"
+                  ]
+          example: "read_only"
+          description: "Resource Access"
+          
+    api_key:
+      type: object
+      required:
+        - "api_key_id"
+        - "api_key_secret"
+      properties:
+        api_key_id:
+          type: string
+          description: "API Key Id"
+          example: AKBSSSBMJCM7FNNTIO5
+        api_key_secret:
+          type: string
+          description: "API Key Secret"
+          example: a3edrECHBBcYEPO2BwNDZW6npHPc0pPzHLLzj
+      example:
+        api_key_id: "AKBSSSBMJCM7FNNTIO5"
+        api_key_secret: "a3edrECHBBcYEPO2BwNDZW6npHPc0pPzHLLzj"
+        
+  responses:
+    unexpected_error_response:
+      description: 

@@ -1,0 +1,39 @@
+    properties:
+        status:
+          type: number
+        message:
+          type: string
+        tid:
+          type: number
+          
+    api_key_request:
+      type: "object"
+      required:
+      - "name"
+      - "description"
+      - "roles"
+      properties:
+        name:
+          type: "string"
+          description: "API Key Name"
+          example: "Security Adv"
+        description:
+          type: "string"
+          description: "API Key Description"
+          example: "Security Adv description"
+        expiration:
+          type: "string"
+          format: "string"
+          description: "The expiration date is in UTC Timestamp in seconds."
+          example: "1716971142" 
+        roles:
+          type: "array"
+          "items": {
+            $ref: "#/components/schemas/role"
+          }
+      example:
+        name: "Security Adv"
+        description: "Security Adv description"
+        expiration: "1716971142"
+        roles: [
+            {name: "100" 

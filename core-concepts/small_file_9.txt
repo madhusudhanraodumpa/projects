@@ -1,0 +1,35 @@
+tion/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "403":
+          description: Client type, scope or access token not valid or allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /token-tenantid:
+    post:
+      tags:
+        - token
+      summary: Endpoint for requesting a registration token from IAM with providing the tenant_id.
+      parameters:
+        - in: header
+  

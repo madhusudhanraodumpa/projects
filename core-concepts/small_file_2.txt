@@ -1,0 +1,28 @@
+he token,
+        additionally contains the fields \"accountNumber\", \"accountName\", \"accountSapId\", and \"accountId\" which hold the 
+        data received from the License Enforcement service.
+
+      parameters:
+        - in: query
+          name: license_key
+          required: true
+          schema:
+            type: string
+          description: "license key of user account"
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+            Besides the default field the returned registration token additionally contains the fields \"accountNumber\", \"accountName\", \"accountSapId\", and \"accountId\".
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+            

@@ -1,0 +1,17 @@
+ken). This token must be valid and must:
+            <li>contain the claim tenant_id with non-empty value,</li>
+            <li>contain the scope required for the requested client type (this has been agreed on in the IAM-RS onboarding process) and</li>
+            <li>contain all claims sent via parameter additional_claims (if that parameter is sent).</li>          
+
+        - in: query
+          name: max_clients
+          description: "Maximum number of clients that can use the registration token for creating an access token. If this parameter is not provided a value of 1 will be used."
+          required: false
+          schema:
+            type: string
+
+        - in: query
+          name: additional_claims
+          description: "URL encoded list (white space separated) of additional claims which will just be passed through to the /dcr endpoint of IAM. All claims in this list must be contained in the user token sent via parameter access_token."
+          required: false
+          schema:

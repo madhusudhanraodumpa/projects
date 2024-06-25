@@ -1,0 +1,12 @@
+"Unexpected error"
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/error_response'
+            
+    internal_error_response:
+      description: "Internal Error"
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/error_response'

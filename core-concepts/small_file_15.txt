@@ -1,0 +1,39 @@
+: "#/components/schemas/error_response"
+        '500':
+          $ref: '#/components/responses/internal_error_response'
+        'default':
+          $ref: '#/components/responses/unexpected_error_response'
+
+##############################################################################
+# response definitions
+##############################################################################
+
+components:
+  schemas:
+    success_response:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 200
+        message:
+          type: object
+          properties:
+            registration_token:
+              type: string
+            expire_timestamp:
+              type: number
+            token_type:
+              type: string
+              example: "Registration"
+            registration_uri:
+              type: string
+        tid:
+          type: number
+
+    error_response:
+      type: object
+      required:
+        - status
+        - message
+  

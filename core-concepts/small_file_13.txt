@@ -1,0 +1,24 @@
+      description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+                
+  ##############################################################################
+  
+  /api-key-management/api-key:
+    post:
+      security:
+       - Bearer: [] # Authorization header, Bearer Token - Allowed Scopes: []
+      tags:
+        - API Keys Management
+      summary: "Creates a new API Key"  
+      description: >-
+        Create a new API Key with roles and other details passed in the request body and associates the API Key to a tenancy. API response contains the API Key & Id of the newly created API key.
+      operationId: "createAPIKey"
+      parameters:
+        - name: "user_token"
+          in: "header"
+          description: >-
+            User token contains details like tenant_id, email id etc. 
+             - tenant_id - BPS Tenant ID is used to associate the API key to tena

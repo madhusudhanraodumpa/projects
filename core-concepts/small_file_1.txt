@@ -1,0 +1,29 @@
+    email: _263bb9@mcafee.com
+
+tags:
+  - name: token
+  - name: license
+
+security:
+  - Bearer: []
+
+servers:
+  - url: "https://iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS production environment
+  - url: "https://devint.iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS devint environment
+  - url: "https://preprod.iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS preprod environment
+
+##############################################################################
+
+paths:
+  /license:
+    post:
+      tags:
+        - license
+      summary: Endpoint for requesting a registration token from IAM given a license key.
+      description: >-
+        On incoming requests the License Enforcement service is contacted for retrieving the account 
+        name, account number and account ID for provided license key.
+        If the license key is valid a registration token is created which, besides the default fields in t

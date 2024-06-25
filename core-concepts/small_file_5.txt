@@ -1,0 +1,35 @@
+  "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: License key not authorized.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /token:
+    post:
+      tags:
+        - token
+      summary: Endpoint for requesting a registration token from IAM given an access tok

@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  version: v1.2
+  title: IAM Registration Service
+  description: >-
+    This is the API specification for the IAM Registration Service (IAM-RS).
+
+    IAM-RS handles the creation of IAM registration tokens which can be used to register client instances at the IAM service.
+
+    Please visit the IAM-RS Confluence page for more information on this service: https://confluence.trellix.com/display/CET/IAM+Registration+Service+Overview.
+
+    The license endpoints in this API version are the same as the ones in API v1.1.
+    The differences in the token and token-tenandid endpoint of this API version compared to API v1.2 is:
+
+      * Parameter \"additional_claims\" at endpoint token-tenantid has been replaced by parameter \"additional_payload\" which has the same purpose as that parameter for the /dcr endpoint of IAM. That is, all (non-reserved) claims from the JSON sent via this parameter are added as additional payload to the registration token.
+
+  contact:
+    name: DL IAM-RS

@@ -1,0 +1,569 @@
+openapi: 3.0.0
+info:
+  version: v1.2
+  title: IAM Registration Service
+  description: >-
+    This is the API specification for the IAM Registration Service (IAM-RS).
+
+    IAM-RS handles the creation of IAM registration tokens which can be used to register client instances at the IAM service.
+
+    Please visit the IAM-RS Confluence page for more information on this service: https://confluence.trellix.com/display/CET/IAM+Registration+Service+Overview.
+
+    The license endpoints in this API version are the same as the ones in API v1.1.
+    The differences in the token and token-tenandid endpoint of this API version compared to API v1.2 is:
+
+      * Parameter \"additional_claims\" at endpoint token-tenantid has been replaced by parameter \"additional_payload\" which has the same purpose as that parameter for the /dcr endpoint of IAM. That is, all (non-reserved) claims from the JSON sent via this parameter are added as additional payload to the registration token.
+
+  contact:
+    name: DL IAM-RS
+    email: _263bb9@mcafee.com
+
+tags:
+  - name: token
+  - name: license
+
+security:
+  - Bearer: []
+
+servers:
+  - url: "https://iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS production environment
+  - url: "https://devint.iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS devint environment
+  - url: "https://preprod.iam-rs.skyhigh.cloud/iam-registration-service/v1.3"
+    description: IAM-RS preprod environment
+
+##############################################################################
+
+paths:
+  /license:
+    post:
+      tags:
+        - license
+      summary: Endpoint for requesting a registration token from IAM given a license key.
+      description: >-
+        On incoming requests the License Enforcement service is contacted for retrieving the account 
+        name, account number and account ID for provided license key.
+        If the license key is valid a registration token is created which, besides the default fields in the token,
+        additionally contains the fields \"accountNumber\", \"accountName\", \"accountSapId\", and \"accountId\" which hold the 
+        data received from the License Enforcement service.
+
+      parameters:
+        - in: query
+          name: license_key
+          required: true
+          schema:
+            type: string
+          description: "license key of user account"
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+            Besides the default field the returned registration token additionally contains the fields \"accountNumber\", \"accountName\", \"accountSapId\", and \"accountId\".
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Could not get data from License Enforcement Service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /license-nsp:
+    post:
+      tags:
+        - license
+      summary: Endpoint for requesting a registration token from IAM given a license key as used by NSP.
+      description: >-
+        On incoming requests the NSP licensing service is contacted for retrieving the account 
+        name and UCN for the provided license key.
+        If the license key is valid a registration token is created which, besides the default fields in the token,
+        additionally contains the fields \"accountName\" and \"ucn\" which hold the data received
+        from the NSP licensing service.
+
+      parameters:
+        - in: query
+          name: license_key
+          required: true
+          schema:
+            type: string
+          description: "license key of user account"
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+            Besides the default field the returned registration token additionally contains the fields \"accountName\" and \"ucn\".
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: License key not authorized.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /token:
+    post:
+      tags:
+        - token
+      summary: Endpoint for requesting a registration token from IAM given an access token.
+      parameters:
+        - in: header
+          name: Authorization header
+          schema:
+            type: string
+          description: >-
+            Authorization header with expected format: \"Authorization: Bearer \<access token\>\".
+            If this header field is missing, the token is invalid or the token does not contain the required scopes, IAM-RS immediately responds status code 401 (missing or invalid) or 403 otherwise.
+            This token must contain the scope "iamrs.a".
+            Furthermore, it must contain the scopes which are required for the requested client type.
+
+        - in: query
+          name: client_type
+          required: true
+          schema:
+            type: string
+          description: "client type for which to create the registration token"
+
+        - in: query
+          name: access_token
+          required: true
+          schema:
+            type: string
+          description: >-
+            Input access token (also called user token). This token must be valid and must:
+            <li>contain the claim tenant_id with non-empty value,</li>
+            <li>contain the scope required for the requested client type (this has been agreed on in the IAM-RS onboarding process) and</li>
+            <li>contain all claims sent via parameter additional_claims (if that parameter is sent).</li>          
+
+        - in: query
+          name: max_clients
+          description: "Maximum number of clients that can use the registration token for creating an access token. If this parameter is not provided a value of 1 will be used."
+          required: false
+          schema:
+            type: string
+
+        - in: query
+          name: additional_claims
+          description: "URL encoded list (white space separated) of additional claims which will just be passed through to the /dcr endpoint of IAM. All claims in this list must be contained in the user token sent via parameter access_token."
+          required: false
+          schema:
+            type: string
+
+        - in: query
+          name: short_token
+          description: 'Whether to get a registration token in JWT format or a \"short token\". Possible values: true, false'
+          required: false
+          schema:
+            type: boolean
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Unauthorized access. This is the case if the access token passed via authorization header is invalid or does not contain the scope \"iamrs.a\".
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "403":
+          description: Client type, scope or access token not valid or allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /token-tenantid:
+    post:
+      tags:
+        - token
+      summary: Endpoint for requesting a registration token from IAM with providing the tenant_id.
+      parameters:
+        - in: header
+          name: Authorization header
+          schema:
+            type: string
+          description: >-
+            Authorization header with expected format: \"Authorization: Bearer \<access token\>\".
+            If this header field is missing, the token is invalid or the token does not contain the required scopes, IAM-RS immediately responds status code 401 (missing or invalid) or 403 otherwise.
+            Furthermore, it must contain the scopes which are required for the requested client type.
+
+        - in: query
+          name: client_type
+          required: true
+          schema:
+            type: string
+          description: "client type for which to create the registration token"
+
+        - in: query
+          name: tenant_id
+          required: true
+          schema:
+            type: string
+          description: "tenant_id which IAM-RS passes to /dcr endpoint of IAM for requesting a registration token"
+
+        - in: query
+          name: additional_payload
+          required: false
+          schema:
+            type: string
+          description: >-
+            Base64 encoded JSON holding the claims and values to be inserted into the registration token.          
+
+        - in: query
+          name: short_token
+          description: 'Whether to get a registration token in JWT format or a \"short token\". Possible values: true, false'
+          required: false
+          schema:
+            type: boolean
+
+        - in: query
+          name: max_clients
+          description: "Maximum number of clients that can use the registration token for creating an access token. If this parameter is not provided a value of 1 will be used."
+          required: false
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Unauthorized access. This is the case if the access token passed via authorization header is invalid or does not contain the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "403":
+          description: Client type, scope or access token not valid or allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+                
+  ##############################################################################
+  
+  /api-key-management/api-key:
+    post:
+      security:
+       - Bearer: [] # Authorization header, Bearer Token - Allowed Scopes: []
+      tags:
+        - API Keys Management
+      summary: "Creates a new API Key"  
+      description: >-
+        Create a new API Key with roles and other details passed in the request body and associates the API Key to a tenancy. API response contains the API Key & Id of the newly created API key.
+      operationId: "createAPIKey"
+      parameters:
+        - name: "user_token"
+          in: "header"
+          description: >-
+            User token contains details like tenant_id, email id etc. 
+             - tenant_id - BPS Tenant ID is used to associate the API key to tenancy. 
+             - email -  Email address of the user whose has requested to create the API key. This is used to save created by email address.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: "API Key to create"
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/api_key_request'
+      responses:
+        "200":
+          description: >-
+            API Key Creation was successful and the apiKey are
+            returned.
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/api_key"
+        "400":
+          description: "Invalid input data"
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "Invalid token"
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/error_response"
+        '500':
+          $ref: '#/components/responses/internal_error_response'
+        'default':
+          $ref: '#/components/responses/unexpected_error_response'
+
+##############################################################################
+# response definitions
+##############################################################################
+
+components:
+  schemas:
+    success_response:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 200
+        message:
+          type: object
+          properties:
+            registration_token:
+              type: string
+            expire_timestamp:
+              type: number
+            token_type:
+              type: string
+              example: "Registration"
+            registration_uri:
+              type: string
+        tid:
+          type: number
+
+    error_response:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: number
+        message:
+          type: string
+        tid:
+          type: number
+          
+    api_key_request:
+      type: "object"
+      required:
+      - "name"
+      - "description"
+      - "roles"
+      properties:
+        name:
+          type: "string"
+          description: "API Key Name"
+          example: "Security Adv"
+        description:
+          type: "string"
+          description: "API Key Description"
+          example: "Security Adv description"
+        expiration:
+          type: "string"
+          format: "string"
+          description: "The expiration date is in UTC Timestamp in seconds."
+          example: "1716971142" 
+        roles:
+          type: "array"
+          "items": {
+            $ref: "#/components/schemas/role"
+          }
+      example:
+        name: "Security Adv"
+        description: "Security Adv description"
+        expiration: "1716971142"
+        roles: [
+            {name: "100" , resources: [{resource_id: "1001", resource_access: "read_only"}]},
+            {name: "105" , resources: [
+              {resource_id: "1051", resource_access: "read_write"},
+              {resource_id: '1051', resource_access: "read_only"}
+            ]}
+          ]   
+
+    role:
+      type: "object"
+      required:
+        - "id"
+        - "resources"
+      properties:
+        id:
+          type: "string"
+          example: "100"
+          "enum": [ // get all the list of Roles and resources
+                    "100",
+                    "101"
+                  ]
+          description: >
+            Role Name / ID
+              
+        resources:
+          type: "array"
+          "items": {
+            $ref: "#/components/schemas/resource"
+          }
+    
+    resource:
+      type: "object"
+      required:
+        - "resource_id"
+        - "resource_access"
+      properties:
+        resource_id:
+          type: "string"
+          example: "100"
+          "enum": [ // check description for all list
+                    "1001",
+                    "1011"
+                  ]
+          description: >
+            Resource Name / ID
+              
+        resource_access:
+          type: "string"
+          "enum": [
+                    "read_only",
+                    "read_write"
+                  ]
+          example: "read_only"
+          description: "Resource Access"
+          
+    api_key:
+      type: object
+      required:
+        - "api_key_id"
+        - "api_key_secret"
+      properties:
+        api_key_id:
+          type: string
+          description: "API Key Id"
+          example: AKBSSSBMJCM7FNNTIO5
+        api_key_secret:
+          type: string
+          description: "API Key Secret"
+          example: a3edrECHBBcYEPO2BwNDZW6npHPc0pPzHLLzj
+      example:
+        api_key_id: "AKBSSSBMJCM7FNNTIO5"
+        api_key_secret: "a3edrECHBBcYEPO2BwNDZW6npHPc0pPzHLLzj"
+        
+  responses:
+    unexpected_error_response:
+      description: "Unexpected error"
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/error_response'
+            
+    internal_error_response:
+      description: "Internal Error"
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/error_response'

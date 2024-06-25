@@ -1,0 +1,29 @@
+quired: false
+          schema:
+            type: string
+          description: >-
+            Base64 encoded JSON holding the claims and values to be inserted into the registration token.          
+
+        - in: query
+          name: short_token
+          description: 'Whether to get a registration token in JWT format or a \"short token\". Possible values: true, false'
+          required: false
+          schema:
+            type: boolean
+
+        - in: query
+          name: max_clients
+          description: "Maximum number of clients that can use the registration token for creating an access token. If this parameter is not provided a value of 1 will be used."
+          required: false
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+          content:
+            application/json:
+              schema:
+    

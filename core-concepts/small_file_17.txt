@@ -1,0 +1,39 @@
+, resources: [{resource_id: "1001", resource_access: "read_only"}]},
+            {name: "105" , resources: [
+              {resource_id: "1051", resource_access: "read_write"},
+              {resource_id: '1051', resource_access: "read_only"}
+            ]}
+          ]   
+
+    role:
+      type: "object"
+      required:
+        - "id"
+        - "resources"
+      properties:
+        id:
+          type: "string"
+          example: "100"
+          "enum": [ // get all the list of Roles and resources
+                    "100",
+                    "101"
+                  ]
+          description: >
+            Role Name / ID
+              
+        resources:
+          type: "array"
+          "items": {
+            $ref: "#/components/schemas/resource"
+          }
+    
+    resource:
+      type: "object"
+      required:
+        - "resource_id"
+        - "resource_access"
+      properties:
+        resource_id:
+          type: "string"
+          example: "100"
+          "enum": [ //

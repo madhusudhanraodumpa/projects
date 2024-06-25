@@ -1,0 +1,26 @@
+ing service is contacted for retrieving the account 
+        name and UCN for the provided license key.
+        If the license key is valid a registration token is created which, besides the default fields in the token,
+        additionally contains the fields \"accountName\" and \"ucn\" which hold the data received
+        from the NSP licensing service.
+
+      parameters:
+        - in: query
+          name: license_key
+          required: true
+          schema:
+            type: string
+          description: "license key of user account"
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+            Besides the default field the returned registration token additionally contains the fields \"accountName\" and \"ucn\".
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+      

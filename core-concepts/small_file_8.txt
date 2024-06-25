@@ -1,0 +1,30 @@
+            type: string
+
+        - in: query
+          name: short_token
+          description: 'Whether to get a registration token in JWT format or a \"short token\". Possible values: true, false'
+          required: false
+          schema:
+            type: boolean
+
+      responses:
+        "200":
+          description: >-
+            Request was successful and a JSON object containing the requested
+            registration token is returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Unauthorized access. This is the case if the access token passed via authorization header is invalid or does not contain the scope \"iamrs.a\".
+          content:
+            applica

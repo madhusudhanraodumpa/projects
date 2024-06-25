@@ -1,0 +1,26 @@
+en.
+      parameters:
+        - in: header
+          name: Authorization header
+          schema:
+            type: string
+          description: >-
+            Authorization header with expected format: \"Authorization: Bearer \<access token\>\".
+            If this header field is missing, the token is invalid or the token does not contain the required scopes, IAM-RS immediately responds status code 401 (missing or invalid) or 403 otherwise.
+            This token must contain the scope "iamrs.a".
+            Furthermore, it must contain the scopes which are required for the requested client type.
+
+        - in: query
+          name: client_type
+          required: true
+          schema:
+            type: string
+          description: "client type for which to create the registration token"
+
+        - in: query
+          name: access_token
+          required: true
+          schema:
+            type: string
+          description: >-
+            Input access token (also called user to

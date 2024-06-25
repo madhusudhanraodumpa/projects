@@ -1,0 +1,33 @@
+  schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Could not get data from License Enforcement Service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+          description: Error in communication with IAM.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+  ##############################################################################
+
+  /license-nsp:
+    post:
+      tags:
+        - license
+      summary: Endpoint for requesting a registration token from IAM given a license key as used by NSP.
+      description: >-
+        On incoming requests the NSP licens

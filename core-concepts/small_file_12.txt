@@ -1,0 +1,32 @@
+            $ref: "#/components/schemas/success_response"
+
+        "400":
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "401":
+          description: Unauthorized access. This is the case if the access token passed via authorization header is invalid or does not contain the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "403":
+          description: Client type, scope or access token not valid or allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "404":
+          description: Invalid address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+
+        "500":
+    

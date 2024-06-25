@@ -1,0 +1,33 @@
+ncy. 
+             - email -  Email address of the user whose has requested to create the API key. This is used to save created by email address.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: "API Key to create"
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/api_key_request'
+      responses:
+        "200":
+          description: >-
+            API Key Creation was successful and the apiKey are
+            returned.
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/api_key"
+        "400":
+          description: "Invalid input data"
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "Invalid token"
+          content:
+            "*/*":
+              schema:
+                $ref
